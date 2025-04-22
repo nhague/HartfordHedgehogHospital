@@ -334,7 +334,7 @@ const HomePage = ({ darkMode, navigateTo }) => {
     <div className="px-4 py-6">
       <div className={`rounded-xl overflow-hidden shadow-lg mb-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <img 
-          src="/main-image.jpeg"
+          src={process.env.PUBLIC_URL + "/images/main-image.jpeg"}
           alt="Cute hedgehog"
           className="w-full h-48 object-cover"
         />
@@ -387,15 +387,15 @@ const HomePage = ({ darkMode, navigateTo }) => {
         <h2 className="text-xl font-bold text-green-600 mb-3">Recently Rescued</h2>
         <div className="flex overflow-x-auto space-x-4 pb-2">
           <div className="flex-none w-32">
-            <img src="/hedgehog1.jpeg" alt="Rescued hedgehog Spike" className="w-full h-32 rounded-lg object-cover" />
+            <img src={process.env.PUBLIC_URL + "/images/hedgehog1.jpeg"} alt="Rescued hedgehog Spike" className="w-full h-32 rounded-lg object-cover" />
             <p className="text-center text-sm mt-1">Spike</p>
           </div>
           <div className="flex-none w-32">
-            <img src="/hedgehog2.jpeg" alt="Rescued hedgehog Holly" className="w-full h-32 rounded-lg object-cover" />
+            <img src={process.env.PUBLIC_URL + "/images/hedgehog2.jpeg"} alt="Rescued hedgehog Holly" className="w-full h-32 rounded-lg object-cover" />
             <p className="text-center text-sm mt-1">Holly</p>
           </div>
           <div className="flex-none w-32">
-            <img src="/hedgehog3.jpeg" alt="Rescued hedgehog Prickles" className="w-full h-32 rounded-lg object-cover" />
+            <img src={process.env.PUBLIC_URL + "/images/hedgehog3.jpeg"} alt="Rescued hedgehog Prickles" className="w-full h-32 rounded-lg object-cover" />
             <p className="text-center text-sm mt-1">Prickles</p>
           </div>
         </div>
@@ -478,7 +478,7 @@ const AboutPage = ({ darkMode }) => {
       <div className={`p-4 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md mb-6`}>
         <h2 className="text-xl font-bold text-green-600 mb-3">About Hartford Hedgehog Rescue</h2>
         <img 
-          src="/api/placeholder/400/200" 
+          src={process.env.PUBLIC_URL + "/images/hedgehog1.jpeg"}
           alt="Hartford Hedgehog Rescue" 
           className="w-full h-48 object-cover rounded-lg mb-4"
         />
@@ -662,7 +662,7 @@ const HelpInfoPage = ({ darkMode }) => {
       <div className={`p-4 rounded-xl ${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-md mb-6`}>
         <h2 className="text-xl font-bold text-green-600 mb-3">Hedgehog Help Guide</h2>
         <img 
-          src="/api/placeholder/400/200" 
+          src={process.env.PUBLIC_URL + "/images/hedgehog2.jpeg"}
           alt="Hedgehog in nature" 
           className="w-full h-48 object-cover rounded-lg mb-4"
         />
