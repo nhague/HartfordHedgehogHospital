@@ -334,7 +334,7 @@ const HomePage = ({ darkMode, navigateTo }) => {
     <div className="px-4 py-6">
       <div className={`rounded-xl overflow-hidden shadow-lg mb-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <img 
-          src="/main-image.jpeg"
+          src="%PUBLIC_URL%/main-image.jpeg"
           alt="Cute hedgehog"
           className="w-full h-48 object-cover"
         />
@@ -387,15 +387,15 @@ const HomePage = ({ darkMode, navigateTo }) => {
         <h2 className="text-xl font-bold text-green-600 mb-3">Recently Rescued</h2>
         <div className="flex overflow-x-auto space-x-4 pb-2">
           <div className="flex-none w-32">
-            <img src="/hedgehog1.jpeg" alt="Rescued hedgehog Spike" className="w-full h-32 rounded-lg object-cover" />
+            <img src="%PUBLIC_URL%/hedgehog1.jpeg" alt="Rescued hedgehog Spike" className="w-full h-32 rounded-lg object-cover" />
             <p className="text-center text-sm mt-1">Spike</p>
           </div>
           <div className="flex-none w-32">
-            <img src="/hedgehog2.jpeg" alt="Rescued hedgehog Holly" className="w-full h-32 rounded-lg object-cover" />
+            <img src="%PUBLIC_URL%/hedgehog2.jpeg" alt="Rescued hedgehog Holly" className="w-full h-32 rounded-lg object-cover" />
             <p className="text-center text-sm mt-1">Holly</p>
           </div>
           <div className="flex-none w-32">
-            <img src="/hedgehog3.jpeg" alt="Rescued hedgehog Prickles" className="w-full h-32 rounded-lg object-cover" />
+            <img src="%PUBLIC_URL%/hedgehog3.jpeg" alt="Rescued hedgehog Prickles" className="w-full h-32 rounded-lg object-cover" />
             <p className="text-center text-sm mt-1">Prickles</p>
           </div>
         </div>
