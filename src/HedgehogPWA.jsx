@@ -1,16 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'; // Added useEffect
 import { Moon, Sun, Menu, X, Phone, Heart, Info, Home, DollarSign, MessageCircle, HelpCircle, AlertTriangle } from 'lucide-react';
 
 const HedgehogPWA = () => {
   const [darkMode, setDarkMode] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState('home');
-
-  useEffect(() => {
-    // Check system preference for dark mode
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    setDarkMode(prefersDark);
-  }, []);
+  const [isDonateModalOpen, setIsDonateModalOpen] = useState(false); // State for modal
 
   const toggleDarkMode = () => {
     setDarkMode(!darkMode);
@@ -147,9 +142,9 @@ const HedgehogPWA = () => {
           </button>
           
           <button 
-            onClick={() => navigateTo('donate')}
-            className={`flex flex-col items-center p-2 ${currentPage === 'donate' ? 'text-green-600' : 'text-gray-500'}`}
-            aria-label="Make a donation"
+            onClick={() => setIsDonateModalOpen(true)} // Open modal instead of navigating
+            className={`flex flex-col items-center p-2 text-gray-500 hover:text-green-600`} // Simplified class, always gray unless hovered
+            aria-label="Open donation modal"
           >
             <Heart size={24} />
             <span className="text-xs mt-1">Donate</span>
@@ -165,9 +160,173 @@ const HedgehogPWA = () => {
           </button>
         </div>
       </footer>
+
+      {/* Donate Modal */}
+      <DonateModal
+        isOpen={isDonateModalOpen}
+        onClose={() => setIsDonateModalOpen(false)}
+        darkMode={darkMode}
+      />
     </div>
   );
 };
+
+// --- Donate Modal Component ---
+const DonateModal = ({ isOpen, onClose, darkMode }) => {
+  const [selectedAmount, setSelectedAmount] = useState(10);
+  const [customAmount, setCustomAmount] = useState('');
+  const [isCustom, setIsCustom] = useState(false);
+
+  useEffect(() => {
+    // Reset state when modal opens/closes
+    if (isOpen) {
+      setSelectedAmount(10);
+      setCustomAmount('');
+      setIsCustom(false);
+    }
+  }, [isOpen]);
+
+  const handleAmountClick = (amount) => {
+    setSelectedAmount(amount);
+    setCustomAmount('');
+    setIsCustom(false);
+  };
+
+  const handleCustomClick = () => {
+    setIsCustom(true);
+    setSelectedAmount(null); // Deselect predefined amounts
+  };
+
+  const handleCustomChange = (e) => {
+    const value = e.target.value;
+    // Allow only numbers and limit length for safety
+    if (/^\d*$/.test(value) && value.length <= 6) {
+      setCustomAmount(value);
+    }
+  };
+
+  const finalAmount = isCustom ? customAmount : selectedAmount;
+
+  return (
+    <div
+      className={`fixed inset-0 z-50 flex items-end justify-center transition-opacity duration-300 ease-out ${
+        isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+      }`}
+      onClick={onClose} // Close on overlay click
+      aria-modal="true"
+      role="dialog"
+    >
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black bg-opacity-50"></div>
+
+      {/* Modal Content */}
+      <div
+        className={`relative w-full max-w-md p-5 rounded-t-2xl shadow-xl transform transition-transform duration-300 ease-out ${
+          darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-900'
+        } ${isOpen ? 'translate-y-0' : 'translate-y-full'}`}
+        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+      >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className={`absolute top-3 right-3 p-1 rounded-full ${darkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:bg-gray-200'} focus:outline-none focus:ring-2 focus:ring-green-500`}
+          aria-label="Close donation modal"
+        >
+          <X size={20} />
+        </button>
+
+        <h2 className="text-xl font-bold text-green-600 mb-3 text-center">Support Our Hedgehogs</h2>
+        <p className={`mb-5 text-center text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+          Your donation helps us provide food, shelter, and vital medical care for injured and orphaned hedgehogs.
+        </p>
+
+        {/* Donation Amount Selection */}
+        <div className="mb-5">
+          <h3 className={`font-medium mb-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Choose an amount:</h3>
+          <div className="grid grid-cols-3 gap-2 mb-3">
+            {[10, 25, 50].map((amount) => (
+              <button
+                key={amount}
+                onClick={() => handleAmountClick(amount)}
+                className={`py-2.5 rounded-lg font-semibold text-sm transition-colors ${
+                  !isCustom && selectedAmount === amount
+                    ? 'bg-green-600 text-white ring-2 ring-green-400'
+                    : `${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
+                } focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
+              >
+                £{amount}
+              </button>
+            ))}
+          </div>
+          
+          {/* Custom Amount */}
+          <button
+            onClick={handleCustomClick}
+            className={`w-full py-2.5 rounded-lg font-semibold text-sm mb-3 transition-colors ${
+              isCustom
+                ? 'bg-green-600 text-white ring-2 ring-green-400'
+                : `${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
+            } focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
+          >
+            Enter Custom Amount
+          </button>
+
+          {isCustom && (
+            <div className="relative">
+              <span className={`absolute inset-y-0 left-3 flex items-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>£</span>
+              <input
+                type="number"
+                id="custom-donation-amount"
+                value={customAmount}
+                onChange={handleCustomChange}
+                className={`block w-full rounded-lg pl-8 pr-4 py-2.5 text-sm border ${
+                  darkMode
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                } focus:ring-green-500 focus:border-green-500`}
+                placeholder="e.g., 5"
+                min="1"
+                step="1"
+                aria-label="Custom donation amount in pounds"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Payment Method Buttons */}
+        <div className="space-y-3">
+           <p className={`text-center text-xs mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+             Selected amount: £{finalAmount || '0'}
+           </p>
+          <button
+            disabled={!finalAmount || finalAmount <= 0}
+            className={`flex items-center justify-center w-full py-3 px-4 text-white font-bold rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
+              !finalAmount || finalAmount <= 0
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+            } ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
+            aria-label={`Donate £${finalAmount || 0} with PayPal`}
+          >
+            <DollarSign size={18} className="mr-1.5" /> Donate £{finalAmount || '0'} with PayPal
+          </button>
+          
+          <button
+            disabled={!finalAmount || finalAmount <= 0}
+            className={`flex items-center justify-center w-full py-3 px-4 text-white font-bold rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
+              !finalAmount || finalAmount <= 0
+                ? 'bg-gray-400 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
+            } ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
+             aria-label={`Donate £${finalAmount || 0} with Card`}
+         >
+            <DollarSign size={18} className="mr-1.5" /> Donate £{finalAmount || '0'} with Card
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 // HOME PAGE
 const HomePage = ({ darkMode, navigateTo }) => {
@@ -175,8 +334,8 @@ const HomePage = ({ darkMode, navigateTo }) => {
     <div className="px-4 py-6">
       <div className={`rounded-xl overflow-hidden shadow-lg mb-6 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
         <img 
-          src="/api/placeholder/400/250" 
-          alt="Cute hedgehog" 
+          src="/main-image.jpeg"
+          alt="Cute hedgehog"
           className="w-full h-48 object-cover"
         />
         <div className="p-4">
@@ -228,15 +387,15 @@ const HomePage = ({ darkMode, navigateTo }) => {
         <h2 className="text-xl font-bold text-green-600 mb-3">Recently Rescued</h2>
         <div className="flex overflow-x-auto space-x-4 pb-2">
           <div className="flex-none w-32">
-            <img src="/api/placeholder/150/150" alt="Rescued hedgehog" className="w-full h-32 rounded-lg object-cover" />
+            <img src="/hedgehog1.jpeg" alt="Rescued hedgehog Spike" className="w-full h-32 rounded-lg object-cover" />
             <p className="text-center text-sm mt-1">Spike</p>
           </div>
           <div className="flex-none w-32">
-            <img src="/api/placeholder/150/150" alt="Rescued hedgehog" className="w-full h-32 rounded-lg object-cover" />
+            <img src="/hedgehog2.jpeg" alt="Rescued hedgehog Holly" className="w-full h-32 rounded-lg object-cover" />
             <p className="text-center text-sm mt-1">Holly</p>
           </div>
           <div className="flex-none w-32">
-            <img src="/api/placeholder/150/150" alt="Rescued hedgehog" className="w-full h-32 rounded-lg object-cover" />
+            <img src="/hedgehog3.jpeg" alt="Rescued hedgehog Prickles" className="w-full h-32 rounded-lg object-cover" />
             <p className="text-center text-sm mt-1">Prickles</p>
           </div>
         </div>
