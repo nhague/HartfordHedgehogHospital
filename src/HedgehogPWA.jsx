@@ -18,6 +18,7 @@ const HedgehogPWA = () => {
   const navigateTo = (page) => {
     setCurrentPage(page);
     setMenuOpen(false);
+    window.scrollTo(0, 0); // Scroll to top on navigation
   };
 
   // Main app container with conditional dark mode class
@@ -176,6 +177,7 @@ const DonateModal = ({ isOpen, onClose, darkMode }) => {
   const [selectedAmount, setSelectedAmount] = useState(10);
   const [customAmount, setCustomAmount] = useState('');
   const [isCustom, setIsCustom] = useState(false);
+  const [showCardDetails, setShowCardDetails] = useState(false); // State for card details view
 
   useEffect(() => {
     // Reset state when modal opens/closes
@@ -183,6 +185,7 @@ const DonateModal = ({ isOpen, onClose, darkMode }) => {
       setSelectedAmount(10);
       setCustomAmount('');
       setIsCustom(false);
+      setShowCardDetails(false); // Reset card view on open/close
     }
   }, [isOpen]);
 
@@ -212,7 +215,8 @@ const DonateModal = ({ isOpen, onClose, darkMode }) => {
       className={`fixed inset-0 z-50 flex items-end justify-center transition-opacity duration-300 ease-out ${
         isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
       }`}
-      onClick={onClose} // Close on overlay click
+      // Close on overlay click ONLY if card details are showing
+      onClick={() => { if (showCardDetails) { onClose(); } }}
       aria-modal="true"
       role="dialog"
     >
@@ -235,93 +239,137 @@ const DonateModal = ({ isOpen, onClose, darkMode }) => {
           <X size={20} />
         </button>
 
-        <h2 className="text-xl font-bold text-green-600 mb-3 text-center">Support Our Hedgehogs</h2>
-        <p className={`mb-5 text-center text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-          Your donation helps us provide food, shelter, and vital medical care for injured and orphaned hedgehogs.
-        </p>
+        {!showCardDetails ? (
+          // Initial Donation View
+          <>
+            <h2 className="text-xl font-bold text-green-600 mb-3 text-center">Support Our Hedgehogs</h2>
+            <p className={`mb-5 text-center text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              Your donation helps us provide food, shelter, and vital medical care for injured and orphaned hedgehogs.
+            </p>
 
-        {/* Donation Amount Selection */}
-        <div className="mb-5">
-          <h3 className={`font-medium mb-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Choose an amount:</h3>
-          <div className="grid grid-cols-3 gap-2 mb-3">
-            {[10, 25, 50].map((amount) => (
+            {/* Donation Amount Selection */}
+            <div className="mb-5">
+              <h3 className={`font-medium mb-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Choose an amount:</h3>
+              <div className="grid grid-cols-3 gap-2 mb-3">
+                {[10, 25, 50].map((amount) => (
+                  <button
+                    key={amount}
+                    onClick={() => handleAmountClick(amount)}
+                    className={`py-2.5 rounded-lg font-semibold text-sm transition-colors ${
+                      !isCustom && selectedAmount === amount
+                        ? 'bg-green-600 text-white ring-2 ring-green-400'
+                        : `${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
+                    } focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
+                  >
+                    £{amount}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Custom Amount */}
               <button
-                key={amount}
-                onClick={() => handleAmountClick(amount)}
-                className={`py-2.5 rounded-lg font-semibold text-sm transition-colors ${
-                  !isCustom && selectedAmount === amount
+                onClick={handleCustomClick}
+                className={`w-full py-2.5 rounded-lg font-semibold text-sm mb-3 transition-colors ${
+                  isCustom
                     ? 'bg-green-600 text-white ring-2 ring-green-400'
                     : `${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
                 } focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
               >
-                £{amount}
+                Enter Custom Amount
               </button>
-            ))}
-          </div>
-          
-          {/* Custom Amount */}
-          <button
-            onClick={handleCustomClick}
-            className={`w-full py-2.5 rounded-lg font-semibold text-sm mb-3 transition-colors ${
-              isCustom
-                ? 'bg-green-600 text-white ring-2 ring-green-400'
-                : `${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`
-            } focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-1 ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
-          >
-            Enter Custom Amount
-          </button>
 
-          {isCustom && (
-            <div className="relative">
-              <span className={`absolute inset-y-0 left-3 flex items-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>£</span>
-              <input
-                type="number"
-                id="custom-donation-amount"
-                value={customAmount}
-                onChange={handleCustomChange}
-                className={`block w-full rounded-lg pl-8 pr-4 py-2.5 text-sm border ${
-                  darkMode
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
-                } focus:ring-green-500 focus:border-green-500`}
-                placeholder="e.g., 5"
-                min="1"
-                step="1"
-                aria-label="Custom donation amount in pounds"
-              />
+              {isCustom && (
+                <div className="relative">
+                  <span className={`absolute inset-y-0 left-3 flex items-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>£</span>
+                  <input
+                    type="number"
+                    id="custom-donation-amount"
+                    value={customAmount}
+                    onChange={handleCustomChange}
+                    className={`block w-full rounded-lg pl-8 pr-4 py-2.5 text-sm border ${
+                      darkMode
+                        ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                        : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                    } focus:ring-green-500 focus:border-green-500`}
+                    placeholder="e.g., 5"
+                    min="1"
+                    step="1"
+                    aria-label="Custom donation amount in pounds"
+                  />
+                </div>
+              )}
             </div>
-          )}
-        </div>
 
-        {/* Payment Method Buttons */}
-        <div className="space-y-3">
-           <p className={`text-center text-xs mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-             Selected amount: £{finalAmount || '0'}
-           </p>
-          <button
-            disabled={!finalAmount || finalAmount <= 0}
-            className={`flex items-center justify-center w-full py-3 px-4 text-white font-bold rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
-              !finalAmount || finalAmount <= 0
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
-            } ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
-            aria-label={`Donate £${finalAmount || 0} with PayPal`}
-          >
-            <DollarSign size={18} className="mr-1.5" /> Donate £{finalAmount || '0'} with PayPal
-          </button>
-          
-          <button
-            disabled={!finalAmount || finalAmount <= 0}
-            className={`flex items-center justify-center w-full py-3 px-4 text-white font-bold rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
-              !finalAmount || finalAmount <= 0
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
-            } ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
-             aria-label={`Donate £${finalAmount || 0} with Card`}
-         >
-            <DollarSign size={18} className="mr-1.5" /> Donate £{finalAmount || '0'} with Card
-          </button>
-        </div>
+            {/* Payment Method Buttons */}
+            <div className="space-y-3">
+               <p className={`text-center text-xs mb-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                 Selected amount: £{finalAmount || '0'}
+               </p>
+              <button
+                disabled={!finalAmount || finalAmount <= 0}
+                className={`flex items-center justify-center w-full py-3 px-4 text-white font-bold rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
+                  !finalAmount || finalAmount <= 0
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+                } ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
+                aria-label={`Donate £${finalAmount || 0} with PayPal`}
+              >
+                <DollarSign size={18} className="mr-1.5" /> Donate £{finalAmount || '0'} with PayPal
+              </button>
+              
+              <button
+                disabled={!finalAmount || finalAmount <= 0}
+                onClick={() => setShowCardDetails(true)} // Show card details on click
+                className={`flex items-center justify-center w-full py-3 px-4 text-white font-bold rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
+                  !finalAmount || finalAmount <= 0
+                    ? 'bg-gray-400 cursor-not-allowed'
+                    : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
+                } ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
+                 aria-label={`Donate £${finalAmount || 0} with Card`}
+             >
+                {/* Icon removed */} Donate £{finalAmount || '0'} with Card
+              </button>
+            </div>
+          </>
+        ) : (
+          // Card Details View
+          <>
+            <h2 className="text-xl font-bold text-green-600 mb-4 text-center">Enter Card Details</h2>
+            <div className="space-y-4 mb-5">
+              {/* Input Field Styling based on existing custom amount input */}
+              <div>
+                <label htmlFor="card-number" className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Credit Card Number</label>
+                <input type="text" id="card-number" placeholder="**** **** **** ****" className={`block w-full rounded-lg px-4 py-2.5 text-sm border ${ darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500' } focus:ring-green-500 focus:border-green-500`} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="expiry-date" className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Expiry Date</label>
+                  <input type="text" id="expiry-date" placeholder="MM/YY" className={`block w-full rounded-lg px-4 py-2.5 text-sm border ${ darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500' } focus:ring-green-500 focus:border-green-500`} />
+                </div>
+                <div>
+                  <label htmlFor="cvv" className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>CVV</label>
+                  <input type="text" id="cvv" placeholder="***" className={`block w-full rounded-lg px-4 py-2.5 text-sm border ${ darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500' } focus:ring-green-500 focus:border-green-500`} />
+                </div>
+              </div>
+              <div>
+                <label htmlFor="name-on-card" className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Name on Card</label>
+                <input type="text" id="name-on-card" placeholder="Full Name" className={`block w-full rounded-lg px-4 py-2.5 text-sm border ${ darkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500' } focus:ring-green-500 focus:border-green-500`} />
+              </div>
+            </div>
+            <button
+              // Add payment processing logic here if needed
+              className={`w-full py-3 px-4 text-white font-bold rounded-lg focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors ${
+                !finalAmount || finalAmount <= 0
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-green-600 hover:bg-green-700 focus:ring-green-500'
+              } ${darkMode ? 'focus:ring-offset-gray-800' : 'focus:ring-offset-white'}`}
+              disabled={!finalAmount || finalAmount <= 0}
+              aria-label={`Pay £${finalAmount || 0} now`}
+            >
+              Pay £{finalAmount || '0'} Now
+            </button>
+          </>
+        )}
       </div>
     </div>
   );
