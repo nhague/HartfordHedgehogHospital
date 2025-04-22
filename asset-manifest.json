@@ -1,0 +1,14 @@
+{
+  "files": {
+    "main.css": "/HartfordHedgehogHospital/static/css/main.440f893a.css",
+    "main.js": "/HartfordHedgehogHospital/static/js/main.6cdd92cb.js",
+    "service-worker.js": "/HartfordHedgehogHospital/service-worker.js",
+    "index.html": "/HartfordHedgehogHospital/index.html",
+    "main.440f893a.css.map": "/HartfordHedgehogHospital/static/css/main.440f893a.css.map",
+    "main.6cdd92cb.js.map": "/HartfordHedgehogHospital/static/js/main.6cdd92cb.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.440f893a.css",
+    "static/js/main.6cdd92cb.js"
+  ]
+}
